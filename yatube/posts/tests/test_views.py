@@ -56,13 +56,6 @@ class PostsPagesTests(TestCase):
         test_post = response.context['page_obj'][0]
         self.assertEqual(test_post, self.post)
 
-
-class PaginatorViewsTest(TestCase):
-
-    def test_second_page_contains_three_records(self):
-        response = self.client.get(reverse('posts:index'), {'page': '2'})
-        self.assertEqual(len(response.context['page_obj']), 0)
-
     def test_group_posts_show_correct_context(self):
         response = self.guest_client.get(
             reverse('posts:group_posts', kwargs={'slug': self.group.slug})
