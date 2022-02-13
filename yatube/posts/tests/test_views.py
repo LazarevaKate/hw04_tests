@@ -65,7 +65,7 @@ class PaginatorViewsTest(TestCase):
 
     def test_group_posts_show_correct_context(self):
         response = self.guest_client.get(
-        reverse('posts:group_posts', kwargs={'slug': self.group.slug})
+            reverse('posts:group_posts', kwargs={'slug': self.group.slug})
         )
         test_obj = response.context['page_obj'][0]
         test_text = response.context['text']
