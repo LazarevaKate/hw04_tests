@@ -49,8 +49,7 @@ class PostFormTests(TestCase):
         self.assertTrue(
             Post.objects.filter(
                 group=self.group.id,
-                text='text post',
-            ).exists()
+                text='text post').exists()
         )
 
     def test_text_valid_form_edit_post(self):
