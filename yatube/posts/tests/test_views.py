@@ -63,7 +63,6 @@ class PaginatorViewsTest(TestCase):
         response = self.client.get(reverse('posts:index'), {'page': '2'})
         self.assertEqual(len(response.context['page_obj']), 0)
 
-
     def test_group_posts_show_correct_context(self):
         response = self.guest_client.get(
         reverse('posts:group_posts', kwargs={'slug': self.group.slug})
@@ -102,7 +101,6 @@ class PaginatorViewsTest(TestCase):
         self.assertEqual(text, post.text)
         self.assertEqual(group, post.group)
         self.assertEqual(14, post_count)
-
 
     def test_post_edit_show_correct_context(self):
         response = self.authorized_client.get(
