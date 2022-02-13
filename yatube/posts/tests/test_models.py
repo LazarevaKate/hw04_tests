@@ -45,4 +45,3 @@ class GroupModelTest(TestCase):
         group = GroupModelTest.group
         object_name = group.title
         self.assertEqual(object_name, str(group))
-
