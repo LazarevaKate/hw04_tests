@@ -2,7 +2,9 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 
+from ..forms import PostForm
 from ..models import Post, Group
+from ..views import POST_COUNT
 
 User = get_user_model()
 
@@ -14,13 +16,12 @@ class PostsPagesTests(TestCase):
         cls.post_author = User.objects.create_user(username='auth')
         cls.group = Group.objects.create(
             title='Тестовый заголовок',
-            description='Тестовый текст',
+            description='Тестовое описание',
             slug='test-slug'
         )
         cls.post = Post.objects.create(
             text='Тестовый текст',
             author=cls.post_author,
-            pub_date='13.02.22',
             group=cls.group
         )
 
@@ -52,52 +53,94 @@ class PostsPagesTests(TestCase):
                 self.assertTemplateUsed(response, template)
 
     def test_index_show_correct_context(self):
-        response = self.client.get(reverse('posts:index'))
-        test_post = response.context['page_obj'][0]
-        self.assertEqual(test_post, self.post)
+        response = self.authorized_client.get(reverse('posts:index'))
+        self.assertEqual(len(response.context['page_obj'].object_list), 1)
 
     def test_group_posts_show_correct_context(self):
-        response = self.guest_client.get(
+        response = self.authorized_client.get(
             reverse('posts:group_posts', kwargs={'slug': self.group.slug})
         )
-        test_obj = response.context['page_obj'][0]
-        test_text = response.context['text']
-        test_group = response.context['group']
-        test_author = str(test_obj.author)
-        self.assertEqual(test_obj, self.post)
-        self.assertEqual(str(test_author), 'author')
-        self.assertEqual(test_text, 'some text')
-        self.assertEqual(test_group, self.group)
+        test_obj = response.context['group']
+        test_text = response.context['page_obj'][0].text
+        test_group = response.context['page_obj'][0].group.title
+        self.assertEqual(test_obj, self.group)
+        self.assertEqual(test_text, 'Тестовый текст')
+        self.assertEqual(test_group, 'Тестовый заголовок')
 
     def test_profile_show_correct_context(self):
         response = self.authorized_client.get(
-            reverse('posts:profile', kwargs={'slug': self.user.username})
+            reverse('posts:profile', kwargs={'username': self.user.username})
         )
-        author = response.context['page_obj'][0]
-        self.assertEqual(author['username'], 0)
+        self.assertEqual(response.context['author'] == PostsPagesTests.post_author, 0)
 
     def test_post_create_show_correct_context(self):
         response = self.authorized_client.get(reverse('posts:post_create'))
-        form_field_text = response.context['form'].initial['text']
-        self.assertEqual(form_field_text, self.post.text)
+        form = response.context.get('form')
+        self.assertIsInstance(form, PostForm)
+        is_edit = response.context.get('is_edit')
+        self.assertIsNone(is_edit, PostForm)
 
     def test_post_detail_show_correct_context(self):
         response = self.authorized_client.get(
-            reverse('posts:post_detail', kwargs={'post_id': self.post.id})
+            reverse('posts:group_posts', kwargs={'slug': self.group.slug})
         )
-        post = response.context['post']
-        author = self.author
-        group = self.group
-        text = 'Text for test'
-        post_count = response.context['post_count']
-        self.assertEqual(author, post.author)
-        self.assertEqual(text, post.text)
-        self.assertEqual(group, post.group)
-        self.assertEqual(14, post_count)
+        first_object = response.context['page_obj'][0]
+        author = first_object.author
+        group = first_object.group
+        text = first_object.text
+        self.assertEqual(author, self.post_author)
+        self.assertEqual(text, 'Тестовый текст')
+        self.assertEqual(group, self.group)
 
     def test_post_edit_show_correct_context(self):
         response = self.authorized_client.get(
-            reverse('posts:post_edit', kwargs={'post_id': self.post.pk})
+            reverse('posts:post_edit', kwargs={'post_id': self.post.id})
         )
         form_field_text = response.context['form'].initial['text']
         self.assertEqual(form_field_text, self.post.text)
+
+    def test_post_on_page(self):
+        paths = [
+            reverse('posts:index'),
+            reverse('posts:group_posts', kwargs={'slug': self.group.slug}),
+            reverse('posts:profile', kwargs={'username': self.post_author.username}),
+        ]
+        for path in paths:
+            response = self.authorized_client.get(path)
+            posts = response.context['page_obj'][0]
+            self.assertEqual(posts.text, PostsPagesTests.post.text)
+        response = self.authorized_client.get(
+            reverse('posts:group_posts', kwargs={'slug': self.group.slug}))
+        self.assertEqual(len(response.context['page_obj']), 1)
+
+
+
+class PaginatorViewsTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.post_author = User.objects.create_user(username='pagin_test')
+        cls.group = Group.objects.create(
+            title='Тестовый заголовок',
+            description='Тестовое описание',
+            slug='test-slug'
+        )
+        cls.post = [
+            Post.objects.create(
+                text='Тестовый текст' + str(i),
+                author=cls.post_author,
+                pub_date='13.02.22',
+                group=cls.group
+        )
+            for i in range(13)
+        ]
+
+    def test_first_page_contains_ten_records(self):
+        response = self.client.get(reverse('posts:index'))
+        self.assertEqual(len(response.context['page_obj']), POST_COUNT)
+
+    def test_second_page_contains_three_records(self):
+        response = self.client.get(reverse('posts:index') + '?page=2')
+        second_page = Post.objects.count() % POST_COUNT
+        self.assertEqual(len(response.context['page_obj']), second_page)
+
