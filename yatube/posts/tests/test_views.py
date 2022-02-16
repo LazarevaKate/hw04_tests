@@ -71,7 +71,9 @@ class PostsPagesTests(TestCase):
         response = self.authorized_client.get(
             reverse('posts:profile', kwargs={'username': self.user.username})
         )
-        self.assertEqual(response.context['author'] == PostsPagesTests.post_author, 0)
+        self.assertEqual(
+            response.context['author'] == PostsPagesTests.post_author, 0
+        )
 
     def test_post_create_show_correct_context(self):
         response = self.authorized_client.get(reverse('posts:post_create'))
@@ -102,8 +104,12 @@ class PostsPagesTests(TestCase):
     def test_post_on_page(self):
         paths = [
             reverse('posts:index'),
-            reverse('posts:group_posts', kwargs={'slug': self.group.slug}),
-            reverse('posts:profile', kwargs={'username': self.post_author.username}),
+            reverse('posts:group_posts',
+                    kwargs={'slug': self.group.slug}
+                    ),
+            reverse('posts:profile',
+                    kwargs={'username': self.post_author.username}
+                    ),
         ]
         for path in paths:
             response = self.authorized_client.get(path)
@@ -124,6 +130,7 @@ class PaginatorViewsTest(TestCase):
             description='Тестовое описание',
             slug='test-slug'
         )
+
         cls.post = [
             Post.objects.create(
                 text='Тестовый текст' + str(i),
@@ -142,4 +149,3 @@ class PaginatorViewsTest(TestCase):
         response = self.client.get(reverse('posts:index') + '?page=2')
         second_page = Post.objects.count() % POST_COUNT
         self.assertEqual(len(response.context['page_obj']), second_page)
-
