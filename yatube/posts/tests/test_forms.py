@@ -31,7 +31,6 @@ class PostFormTests(TestCase):
         self.authorized_client.force_login(self.user)
 
     def test_create_post(self):
-        """Валидная форма создает запись в Post."""
         posts_count = Post.objects.count()
         form_data = {
             'text': 'test text',

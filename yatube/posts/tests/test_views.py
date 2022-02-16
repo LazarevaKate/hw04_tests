@@ -114,7 +114,6 @@ class PostsPagesTests(TestCase):
         self.assertEqual(len(response.context['page_obj']), 1)
 
 
-
 class PaginatorViewsTest(TestCase):
     @classmethod
     def setUpClass(cls):
