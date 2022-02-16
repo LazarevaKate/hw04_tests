@@ -137,7 +137,7 @@ class PaginatorViewsTest(TestCase):
                 author=cls.post_author,
                 pub_date='13.02.22',
                 group=cls.group
-        )
+            )
             for i in range(13)
         ]
 
