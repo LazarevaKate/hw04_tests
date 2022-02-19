@@ -27,7 +27,7 @@ class PostModelTest(TestCase):
 
     def test_verbose_name(self):
         post = PostModelTest.post
-        group = GroupModelTest.group
+        group = PostModelTest.group
         expected_names = {
             post._meta.get_field('text'): 'Текст поста',
             post._meta.get_field('pub_date'): 'Дата публикации',
@@ -42,7 +42,7 @@ class PostModelTest(TestCase):
 
     def test_help_text(self):
         post = PostModelTest.post
-        group = GroupModelTest.group
+        group = PostModelTest.group
         expected_texts = {
             post._meta.get_field('text'): 'Вставьте текст поста',
             post._meta.get_field('group'): 'Выберите группу',
