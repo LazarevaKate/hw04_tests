@@ -14,7 +14,7 @@ class PostModelTest(TestCase):
             slug='test-slug'
         )
         cls.post = Post.objects.create(
-            text='Какой-то текст',
+            text='Какой-то очень, очень, очень длинный текст',
             author=cls.user,
             pub_date='13.02.22',
             group=cls.group,
@@ -24,6 +24,33 @@ class PostModelTest(TestCase):
         post = PostModelTest.post
         expected_object_name = post.text[:15]
         self.assertEqual(expected_object_name, str(post))
+
+    def test_verbose_name(self):
+        post = PostModelTest.post
+        group = GroupModelTest.group
+        expected_names = {
+            post._meta.get_field('text'): 'Текст поста',
+            post._meta.get_field('pub_date'): 'Дата публикации',
+            post._meta.get_field('author'): 'Автор поста',
+            post._meta.get_field('group'): 'Группа',
+            group._meta.get_field('slug'): 'URL',
+            group._meta.get_field('description'): 'Описание группы'
+        }
+        for value, expected_name in expected_names.items():
+            with self.subTest(value=value):
+                self.assertEqual(value.verbose_name, expected_name)
+
+    def test_help_text(self):
+        post = PostModelTest.post
+        group = GroupModelTest.group
+        expected_texts = {
+            post._meta.get_field('text'): 'Вставьте текст поста',
+            post._meta.get_field('group'): 'Выберите группу',
+            group._meta.get_field('description'): 'Вставьте описание группы'
+        }
+        for value, expected_text in expected_texts.items():
+            with self.subTest(value=value):
+                self.assertEqual(value.help_text, expected_text)
 
 
 class GroupModelTest(TestCase):

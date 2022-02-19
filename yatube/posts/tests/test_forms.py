@@ -2,7 +2,6 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from ..forms import PostForm
 from ..models import Post, Group, User
 
 User = get_user_model()
@@ -13,6 +12,7 @@ class PostFormTests(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.user = User.objects.create_user(username='auth_user')
+        cls.non_author = User.objects.create_user(username='non_author')
         cls.group = Group.objects.create(
             title='test-group',
             description='test-name',
@@ -24,9 +24,9 @@ class PostFormTests(TestCase):
             group=cls.group,
             pub_date='13.02.22'
         )
-        cls.form = PostForm()
 
     def setUp(self):
+        self.guest_client = Client()
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
 
@@ -54,8 +54,9 @@ class PostFormTests(TestCase):
 
     def test_text_valid_form_edit_post(self):
         post_count = Post.objects.count()
+        old_post = self.post.text
         form_data = {
-            'text': self.post.text,
+            'text': 'New post text',
             'group': self.group.id,
         }
         response = self.authorized_client.post(
@@ -63,4 +64,6 @@ class PostFormTests(TestCase):
             data=form_data,
             follow=True
         )
-        self.assertNotEqual(response, post_count)
+        new_post = Post.objects.get(id=self.post.id)
+        self.assertNotEqual(response, old_post, new_post)
+        self.assertNotEqual(Post.objects.count, post_count)
