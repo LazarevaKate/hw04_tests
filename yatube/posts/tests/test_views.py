@@ -141,9 +141,8 @@ class PostsPagesTests(TestCase):
             id=self.post.id,
             text='Какой-то текст',
             group=self.new_group.id).exists()
-                         )
+        )
         self.assertEqual(len(response.context['page_obj']), 1)
-
 
 
 class PaginatorViewsTest(TestCase):
