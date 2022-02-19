@@ -78,7 +78,7 @@ class PostsPagesTests(TestCase):
 
     def test_profile_show_correct_context(self):
         response = self.authorized_client.get(reverse(
-            'posts:profile',kwargs={'username': self.post_author.username})
+            'posts:profile', kwargs={'username': self.post_author.username})
         )
         self.assertTrue(
             response.context['author'] == PostsPagesTests.post_author, 0
@@ -141,7 +141,9 @@ class PostsPagesTests(TestCase):
             id=self.post.id,
             text='Какой-то текст',
             group=self.new_group.id).exists()
-        )
+                         )
+        self.assertEqual(len(response.context['page_obj']), 1)
+
 
 
 class PaginatorViewsTest(TestCase):
