@@ -78,7 +78,8 @@ class PostsPagesTests(TestCase):
 
     def test_profile_show_correct_context(self):
         response = self.authorized_client.get(
-            reverse('posts:profile', kwargs={'username': self.post_author.username})
+            reverse('posts:profile',
+            kwargs={'username': self.post_author.username})
         )
         self.assertTrue(
             response.context['author'] == PostsPagesTests.post_author, 0
@@ -138,12 +139,11 @@ class PostsPagesTests(TestCase):
             reverse('posts:group_posts', kwargs={'slug': self.group.slug})
         )
         test_obj = response.context['page_obj'][0]
-        group = test_obj.group
         self.assertFalse(Post.objects.filter(
             id=self.post.id,
             text='Какой-то текст',
             group=self.new_group.id).exists()
-                         )
+        )
 
 
 class PaginatorViewsTest(TestCase):

@@ -26,7 +26,6 @@ class StaticURLTests(TestCase):
 
     def setUp(self):
         self.guest_client = Client()
-        self.authorized_not_author = User.objects.create_user(username='not_author')
         self.post_author = User.objects.create_user(username='user1')
         self.user = StaticURLTests.post_author
         self.authorized_client = Client()
@@ -63,10 +62,6 @@ class StaticURLTests(TestCase):
 
     def test_not_authorized_guest_has_redirect(self):
         post = Post.objects.count()
-        form_data = {
-            'group': self.group.slug,
-            'text': self.post.text
-        }
         response = self.guest_client.post(
             reverse('posts:post_create'),
             follow=True)
@@ -82,5 +77,5 @@ class StaticURLTests(TestCase):
             data=form_data,
             follow=True
         )
-        self.assertRedirects(response, reverse('posts:post_detail', kwargs={'post_id': self.post.id}))
-
+        self.assertRedirects(response, reverse(
+            'posts:post_detail', kwargs={'post_id': self.post.id}))
