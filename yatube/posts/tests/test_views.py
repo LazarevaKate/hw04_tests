@@ -77,9 +77,8 @@ class PostsPagesTests(TestCase):
                 self.assertEqual(context, expected)
 
     def test_profile_show_correct_context(self):
-        response = self.authorized_client.get(
-            reverse('posts:profile',
-            kwargs={'username': self.post_author.username})
+        response = self.authorized_client.get(reverse(
+            'posts:profile',kwargs={'username': self.post_author.username})
         )
         self.assertTrue(
             response.context['author'] == PostsPagesTests.post_author, 0
@@ -138,7 +137,6 @@ class PostsPagesTests(TestCase):
         response = self.authorized_client.get(
             reverse('posts:group_posts', kwargs={'slug': self.group.slug})
         )
-        test_obj = response.context['page_obj'][0]
         self.assertFalse(Post.objects.filter(
             id=self.post.id,
             text='Какой-то текст',
