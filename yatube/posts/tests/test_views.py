@@ -185,7 +185,8 @@ class PaginatorViewsTest(TestCase):
 
     def test_second_page_group_list_records(self):
         response = self.client.get(reverse(
-            'posts:group_posts', kwargs={'slug': self.group.slug}), {'page': 2})
+            'posts:group_posts',
+            kwargs={'slug': self.group.slug}), {'page': 2})
         second_page = Post.objects.count() % POST_COUNT
         self.assertEqual(len(response.context['page_obj']), second_page)
 
@@ -197,6 +198,7 @@ class PaginatorViewsTest(TestCase):
 
     def test_second_page_profile_records(self):
         response = self.client.get(reverse(
-            'posts:profile', kwargs={'username': self.post_author.username}), {'page': 2})
+            'posts:profile',
+            kwargs={'username': self.post_author.username}), {'page': 2})
         second_page = Post.objects.count() % POST_COUNT
         self.assertEqual(len(response.context['page_obj']), second_page)
