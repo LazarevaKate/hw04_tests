@@ -12,6 +12,7 @@ class StaticURLTests(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.post_author = User.objects.create_user(username='test_user')
+        cls.not_author = User.objects.create_user(username='not_author')
         cls.group = Group.objects.create(
             title='Тестовый заголовок',
             description='Тестовый текст',
@@ -30,6 +31,8 @@ class StaticURLTests(TestCase):
         self.user = StaticURLTests.post_author
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
+        self.authorized_not_author = Client()
+        self.authorized_not_author.force_login(self.not_author)
 
     def test_urls_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
@@ -60,19 +63,11 @@ class StaticURLTests(TestCase):
             f'/posts/{self.post.id}/edit/')
         self.assertEqual(response.status_code, 200)
 
-    def test_not_authorized_guest_has_redirect(self):
-        post = Post.objects.count()
-        response = self.guest_client.post(
-            reverse('posts:post_create'),
-            follow=True)
-        self.assertRedirects(response, ('/auth/login/?next=/create/'))
-        self.assertEqual(Post.objects.count(), post)
-
     def test_authorized_user_cannot_edit_post(self):
         form_data = {
             'text': 'new_text'
         }
-        response = self.authorized_client.post(
+        response = self.authorized_not_author.post(
             reverse('posts:post_edit', kwargs={'post_id': self.post.id}),
             data=form_data,
             follow=True

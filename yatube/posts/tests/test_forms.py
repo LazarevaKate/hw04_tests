@@ -67,3 +67,11 @@ class PostFormTests(TestCase):
         new_post = Post.objects.get(id=self.post.id)
         self.assertNotEqual(response, old_post, new_post)
         self.assertNotEqual(Post.objects.count, post_count)
+
+    def test_not_authorized_guest_has_redirect(self):
+        post = Post.objects.count()
+        response = self.guest_client.post(
+            reverse('posts:post_create'),
+            follow=True)
+        self.assertRedirects(response, ('/auth/login/?next=/create/'))
+        self.assertEqual(Post.objects.count(), post)

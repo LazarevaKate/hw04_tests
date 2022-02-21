@@ -81,8 +81,7 @@ class PostsPagesTests(TestCase):
             'posts:profile', kwargs={'username': self.post_author.username})
         )
         self.assertTrue(
-            response.context['author'] == PostsPagesTests.post_author, 0
-        )
+            response.context['author'] == PostsPagesTests.post_author)
 
     def test_post_create_show_correct_context(self):
         response = self.authorized_client.get(reverse('posts:post_create'))
@@ -184,8 +183,20 @@ class PaginatorViewsTest(TestCase):
         )
         self.assertEqual(len(response.context['page_obj']), POST_COUNT)
 
+    def test_second_page_group_list_records(self):
+        response = self.client.get(reverse(
+            'posts:group_posts', kwargs={'slug': self.group.slug}), {'page': 2})
+        second_page = Post.objects.count() % POST_COUNT
+        self.assertEqual(len(response.context['page_obj']), second_page)
+
     def test_profile_has_page(self):
         response = self.client.get(reverse(
             'posts:profile', kwargs={'username': self.post_author.username})
         )
         self.assertEqual(len(response.context['page_obj']), POST_COUNT)
+
+    def test_second_page_profile_records(self):
+        response = self.client.get(reverse(
+            'posts:profile', kwargs={'username': self.post_author.username}), {'page': 2})
+        second_page = Post.objects.count() % POST_COUNT
+        self.assertEqual(len(response.context['page_obj']), second_page)
