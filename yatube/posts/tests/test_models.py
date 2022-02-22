@@ -25,6 +25,11 @@ class PostModelTest(TestCase):
         expected_object_name = post.text[:15]
         self.assertEqual(expected_object_name, str(post))
 
+    def test_models_group(self):
+        group = PostModelTest.group
+        object_name = group.title
+        self.assertEqual(object_name, str(group))
+
     def test_verbose_name(self):
         post = PostModelTest.post
         group = PostModelTest.group
@@ -51,24 +56,3 @@ class PostModelTest(TestCase):
         for value, expected_text in expected_texts.items():
             with self.subTest(value=value):
                 self.assertEqual(value.help_text, expected_text)
-
-
-class GroupModelTest(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.post_author = User.objects.create_user(username='auth_2')
-        cls.group = Group.objects.create(
-            title='Заголовок',
-            description='Тут текст',
-            slug='test-slug'
-        )
-        cls.post = Post.objects.create(
-            text='текст',
-            author=cls.post_author
-        )
-
-    def test_models(self):
-        group = GroupModelTest.group
-        object_name = group.title
-        self.assertEqual(object_name, str(group))
