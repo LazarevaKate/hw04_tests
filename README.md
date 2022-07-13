@@ -1,3 +1,19 @@
-# hw04_tests
+# Tests
 
-[![CI](https://github.com/yandex-praktikum/hw04_tests/actions/workflows/python-app.yml/badge.svg?branch=master)](https://github.com/yandex-praktikum/hw04_tests/actions/workflows/python-app.yml)
+Написаны тесты для проекта Yatube
+Тесты написаны на Python 3
+
+
+Чтобы запустить проект: 
+
+- Установите и активируйте виртуальное окружение
+- Установите зависимости из файла requirements.txt
+```
+pip install -r requirements.txt
+``` 
+- Для запуска тестового сервера в папке с файлом manage.py выполните команду:
+```
+python3 manage.py runserver
+``` 
+
+Автор Лазарева Екатерина
