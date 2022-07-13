@@ -21,9 +21,9 @@ python -m venv venv
 ```
 pip install -r requirements.txt
 ``` 
-- Для запуска тестового сервера в папке с файлом manage.py выполните команду:
+- Для запуска тестов выполните команду:
 ```
-python3 manage.py runserver
+pytest
 ``` 
 
 Автор Лазарева Екатерина
